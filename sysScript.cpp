@@ -16,9 +16,9 @@
 #include <chrono> //date and time library
 #include <cstdlib> //random numbers, general stuff
 #include <ctime> //c-style time utilities
-#include <experimental/filesystem> //filesystem library
+//#include <filesystem> //filesystem library
 using namespace std; //Getline namespace
-namespace fs = std::experimental::filesystem;
+//namespace fs = std::experimental::filesystem;
 
 //-------------------------------------
 //Function Vars
@@ -26,8 +26,10 @@ char appName[256]; //Name of app the user enters
 char input[256]; //user input choice in initialization
 char realName[256]; //real name of newly added user
 char options[256]; //user input choice in user account alteration
-char username[256]; //username entry for user passwor alteration
+char username[256]; //username entry for user password alteration
+char adminAlt[256]; //username entry for admin alteration
 char newUser[256]; //username for newly added user
+char optionsAlt[256]; //variable for either adding admin or removing admin
 char delUser[256]; //username for user being delete
 char usrDelFunc[256]; //variable for conditional user deleting
 char retDis[256]; //return variable for display function
@@ -44,7 +46,7 @@ void usrDelete();
 //Progress Bar (looks cool)
 void progressbar(){
     std::srand(time(NULL));
-    for(int progress=0;progress!=100;progress+=std::rand()%35){
+    for(int progress=0;progress!=100;progress+=std::rand()%100){
         if(progress>100) progress=100;
         std::cout<<"[";
         for(int i=0;i<100;i++)
@@ -65,10 +67,10 @@ void progressbar(){
 //-------------------------------------
 //Application Open Function
 void appOpen(){
-    printf("All Available Applications...\n");
-    std::string path = "/Users/mj/Applications";
-    for(const auto & entry : fs::directory_iterator(path))
-        std::cout<<entry.path()<<std::endl;
+    //printf("All Available Applications...\n");
+    //std::string path = "/Users/mj/Applications";
+    //for(const auto & entry : fs::directory_iterator(path))
+        //std::cout<<entry.path()<<std::endl;
     printf("Type Application Name (Case Sensitive)\n");
     printf(":");
     scanf("%c", &endLineChar);
@@ -88,7 +90,8 @@ void userAccts(){
     printf("Delete User (b)\n");
     printf("Change User Password (c)\n");
     printf("Display Current Users (d)\n");
-    printf("Return to Menu (e)\n");
+    printf("Admin Right Configuration (e)\n");
+    printf("Return to Menu (f)\n");
     printf("-------------------------\n");
     printf(":");
     scanf("%s", options);
@@ -217,8 +220,50 @@ if(!strcmp(options, "d") || !strcmp(options, "D")){
     }
 }
 
+//Admin Rights Configuration
+if(!strcmp(options, "e") || !strcmp(options, "E")){
+    printf("User Rights Alteration...\n");
+    printf("-------------------------\n");
+    printf("Give User Admin Privileges (a)\n");
+    printf("Remove User Admin Privileges (b)\n");
+    printf("Return to Menu (c)\n");
+    printf("-------------------------\n");
+    printf(":");
+    scanf("%s", optionsAlt);
+
+    if(!strcmp(optionsAlt, "a") || !strcmp(optionsAlt, "A")){
+        printf("Type in Username\n");
+        printf(":");
+        scanf("%c", &endLineChar);
+        cin.getline(adminAlt, 256);
+        std::string alterAddpt1("-append /Groups/admin GroupMembership ");
+        std::string alterAdd(" -t user admin");
+        system(("sudo dscl . " +alterAddpt1 +adminAlt).c_str());
+        initialization();
+    }
+    if(!strcmp(optionsAlt, "b") || !strcmp(optionsAlt, "B")){
+        printf("Type in Username\n");
+        printf(":");
+        scanf("%c", &endLineChar);
+        cin.getline(adminAlt, 256);
+        std::string alterDelpt1("-delete /Groups/admin GroupMembership ");
+        std::string alterDel(" -t user admin");
+        system(("sudo dscl . " +alterDelpt1 +adminAlt).c_str());
+        initialization();
+    }
+    if(!strcmp(optionsAlt, "c") || !strcmp(optionsAlt, "C")){
+        initialization();
+    }
+    else{
+        printf("Input Error...\n");
+        sleep(1);
+        printf("Returning to Menu...\n");
+        initialization();
+    }
+}
+
 //Return to Menu
-if(!strcmp(options, "e") || !strcmp(options, "e")){
+if(!strcmp(options, "f") || !strcmp(options, "F")){
     initialization();
 }
 else {
